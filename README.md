@@ -2,10 +2,10 @@
 
 The goal of this project is to make an REST API which will be used for a blog client and blog CMS. This is the CMS part of the project.
 
--   [View the live blog CMS site here](link goes here)
--   [View the live blog client site here](link goes here)
+-   [View the live blog CMS site here](https://bizarf.github.io/odin-blog-cms/)
+-   [View the live blog client site here](https://bizarf.github.io/odin-blog-client/)
 -   [View the blog API repo](https://github.com/bizarf/odin-blog-api)
--   [View the blog client repo](link goes here)
+-   [View the blog client repo](https://github.com/bizarf/odin-blog-client)
 
 #### Install:
 
