@@ -1,0 +1,8 @@
+body {
+    min-height: 100vh;
+}
+
+/* make the root div take up the whole screen */
+#root {
+    height: 100vh;
+}
