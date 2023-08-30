@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 // import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+// import "react-quill/dist/quill.snow.css";
 import Cookies from "universal-cookie";
 import ErrorsType from "../types/errors";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,13 +71,13 @@ const Editor = () => {
                 })
                 .then((data) => {
                     if (data) {
-                        setTitle(data.title);
-                        setTextContent(data.textContent);
-                        setPublish(data.publish);
+                        setTitle(data.post.title);
+                        setTextContent(data.post.textContent);
+                        setPublish(data.post.published);
                     }
                 });
         }
-    });
+    }, []);
 
     return (
         <div className="mx-auto max-w-4xl">

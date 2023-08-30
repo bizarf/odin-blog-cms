@@ -8,10 +8,10 @@ import ErrorsType from "../types/errors";
 
 type Props = {
     user: UserType | null;
-    setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+    fetchUserData: () => void;
 };
 
-const Login = ({ user, setUser }: Props) => {
+const Login = ({ user, fetchUserData }: Props) => {
     const [username, setUsername] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [error, setError] = useState<[ErrorsType] | []>([]);
@@ -41,16 +41,16 @@ const Login = ({ user, setUser }: Props) => {
                 // data object can either return a token or errors. if we get the token object, then we decode the token and set that as the user state. we store the jwt in the cookie.
                 if (data.token) {
                     const decode: JwtDecodeType = jwtDecode(data.token);
-                    if (decode.user.isAuthor) {
-                        setUser(decode.user);
-                        cookies.set("jwt_auth", data.token, {
-                            // multiply the expiration value from the jwt by 1000 to change the value to milliseconds so that it'll become a valid date
-                            expires: new Date(decode.exp * 1000),
-                        });
+                    cookies.set("jwt_auth", data.token, {
+                        // multiply the expiration value from the jwt by 1000 to change the value to milliseconds so that it'll become a valid date
+                        expires: new Date(decode.exp * 1000),
+                    });
+                    fetchUserData();
+                    if (user?.isAuthor) {
                         setSuccess((state) => !state);
                         setTimeout(() => {
                             navigate("/all-posts");
-                        }, 5000);
+                        }, 500);
                     } else {
                         setError([
                             {

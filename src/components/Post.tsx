@@ -18,16 +18,16 @@ const Post = ({ user }: Props) => {
     const [post, setPost] = useState<PostsType>();
     const [comments, setComments] = useState<CommentsType[]>();
 
-    useEffect(() => {
-        // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
-        const checkCookie = async () => {
-            const jwt = await cookies.get("jwt_auth");
-            if (!jwt) {
-                navigate("/");
-            }
-        };
-        checkCookie();
-    }, [user]);
+    // useEffect(() => {
+    //     // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
+    //     const checkCookie = async () => {
+    //         const jwt = await cookies.get("jwt_auth");
+    //         if (!jwt) {
+    //             navigate("/");
+    //         }
+    //     };
+    //     checkCookie();
+    // }, []);
 
     useEffect(() => {
         // fetch post
@@ -41,7 +41,7 @@ const Post = ({ user }: Props) => {
                 navigate("/posts/error");
             })
             .then((data) => {
-                setPost(data);
+                setPost(data.post);
             });
 
         // fetch comments on post
@@ -52,7 +52,7 @@ const Post = ({ user }: Props) => {
             .then((data) => {
                 setComments(data.allComments);
             });
-    }, [id]);
+    }, []);
 
     const handleDeleteComment = (commentId: string) => {
         const jwt = cookies.get("jwt_auth");
@@ -91,7 +91,7 @@ const Post = ({ user }: Props) => {
                 </p>
                 <p className="mt-5 text-xs text-gray-500 dark:text-gray-400">
                     Created on:
-                    {dayjs(post?.timestamp).format(" ddd DD, YYYY, hh:mma")}
+                    {dayjs(post?.timestamp).format(" ddd DD, MMM YYYY, hh:mma")}
                 </p>
             </div>
             {/* comment container */}
@@ -113,7 +113,7 @@ const Post = ({ user }: Props) => {
                                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                     Posted on:
                                     {dayjs(post?.timestamp).format(
-                                        " ddd DD, YYYY, hh:mma"
+                                        " ddd DD, MMM YYYY, hh:mma"
                                     )}
                                 </p>
                             </div>

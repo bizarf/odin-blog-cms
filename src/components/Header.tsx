@@ -10,9 +10,10 @@ type Props = {
     setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
     theme: string | undefined;
     setTheme: React.Dispatch<React.SetStateAction<string | undefined>>;
+    fetchUserData: () => void;
 };
 
-const Header = ({ user, setUser, theme, setTheme }: Props) => {
+const Header = ({ user, setUser, theme, setTheme, fetchUserData }: Props) => {
     useEffect(() => {
         const pageTheme = localStorage.getItem("theme") || "light";
         setTheme(pageTheme);
@@ -45,18 +46,20 @@ const Header = ({ user, setUser, theme, setTheme }: Props) => {
         const checkCookie = async () => {
             const jwt = await cookies.get("jwt_auth");
             if (jwt) {
-                setUser(jwt);
+                fetchUserData();
             }
         };
         checkCookie();
-    }, [user]);
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 flex w-full border-b-2 bg-white py-4 text-sm dark:border-b-0 dark:bg-gray-800">
             <nav className="flex w-full flex-row items-center justify-between gap-5 px-5 ">
-                <div className="text-slate-700 text-xl dark:text-white">
-                    The Blog CMS
-                </div>
+                <Link to="/">
+                    <div className="text-slate-700 text-xl dark:text-white">
+                        The Blog CMS
+                    </div>
+                </Link>
                 <div className="inline-flex">
                     {user && (
                         <>

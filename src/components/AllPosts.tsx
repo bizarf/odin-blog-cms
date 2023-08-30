@@ -66,16 +66,16 @@ const AllPosts = ({ user }: Props) => {
             });
     };
 
-    useEffect(() => {
-        // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
-        const checkCookie = async () => {
-            const jwt = await cookies.get("jwt_auth");
-            if (!jwt) {
-                navigate("/");
-            }
-        };
-        checkCookie();
-    }, [user]);
+    // useEffect(() => {
+    //     // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
+    //     const checkCookie = async () => {
+    //         const jwt = await cookies.get("jwt_auth");
+    //         if (!jwt) {
+    //             navigate("/");
+    //         }
+    //     };
+    //     checkCookie();
+    // }, []);
 
     return (
         <div className="">

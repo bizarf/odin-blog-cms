@@ -9,11 +9,36 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Editor from "./components/Editor";
 import NoPostError from "./components/NoPostError";
+import Cookies from "universal-cookie";
+import jwtDecode from "jwt-decode";
+import JwtDecodeType from "./types/jwt_decode";
 
 const App = () => {
     const [theme, setTheme] = useState<string>();
-
     const [user, setUser] = useState<User | null>(null);
+
+    const cookies = new Cookies();
+
+    const fetchUserData = () => {
+        const jwt = cookies.get("jwt_auth");
+        const decode: JwtDecodeType = jwtDecode(jwt);
+
+        fetch(
+            `https://odin-blog-api-ofv2.onrender.com/api/user/${decode.user}`,
+            {
+                method: "get",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success === true) {
+                    setUser(data.user);
+                }
+            });
+    };
 
     return (
         // set the app container to a minimum height 100% to allow the div to take up the rest of the space. a must have for the dark mode background colour
@@ -26,11 +51,17 @@ const App = () => {
                         setUser={setUser}
                         theme={theme}
                         setTheme={setTheme}
+                        fetchUserData={fetchUserData}
                     />
                     <Routes>
                         <Route
                             path="/"
-                            element={<Login user={user} setUser={setUser} />}
+                            element={
+                                <Login
+                                    user={user}
+                                    fetchUserData={fetchUserData}
+                                />
+                            }
                         />
                         <Route
                             path="/all-posts"
