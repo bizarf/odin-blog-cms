@@ -4,13 +4,8 @@ import Cookies from "universal-cookie";
 import dayjs from "dayjs";
 import PostsType from "../types/posts";
 import CommentsType from "../types/comments";
-import UserType from "../types/user";
 
-type Props = {
-    user: UserType | undefined;
-};
-
-const Post = ({ user }: Props) => {
+const Post = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const cookies = new Cookies();
@@ -18,32 +13,37 @@ const Post = ({ user }: Props) => {
     const [post, setPost] = useState<PostsType>();
     const [comments, setComments] = useState<CommentsType[]>();
 
-    // useEffect(() => {
-    //     // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
-    //     const checkCookie = async () => {
-    //         const jwt = await cookies.get("jwt_auth");
-    //         if (!jwt) {
-    //             navigate("/");
-    //         }
-    //     };
-    //     checkCookie();
-    // }, []);
-
     useEffect(() => {
-        // fetch post
+        // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
+        const checkCookie = async () => {
+            const jwt = await cookies.get("jwt_auth");
+            if (!jwt) {
+                navigate("/");
+            } else {
+                fetchPost();
+                fetchComments();
+            }
+        };
+        checkCookie();
+    }, []);
+
+    const fetchPost = async () => {
         fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}`)
             .then((response) => {
                 if (response.ok) {
                     return response.json();
+                } else {
+                    // send user back to home page if the post id doesn't exist
+                    Promise.reject(response.statusText);
+                    navigate("/posts/error");
                 }
-                // send user back to home page if the post id doesn't exist
-                Promise.reject(response.statusText);
-                navigate("/posts/error");
             })
             .then((data) => {
                 setPost(data.post);
             });
+    };
 
+    const fetchComments = async () => {
         // fetch comments on post
         fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}/comments`)
             .then((response) => {
@@ -52,7 +52,7 @@ const Post = ({ user }: Props) => {
             .then((data) => {
                 setComments(data.allComments);
             });
-    }, []);
+    };
 
     const handleDeleteComment = (commentId: string) => {
         const jwt = cookies.get("jwt_auth");

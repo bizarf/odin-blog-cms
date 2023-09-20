@@ -10,10 +10,9 @@ type Props = {
     setUser: React.Dispatch<React.SetStateAction<UserType | undefined>>;
     theme: string | undefined;
     setTheme: React.Dispatch<React.SetStateAction<string | undefined>>;
-    fetchUserData: () => void;
 };
 
-const Header = ({ user, setUser, theme, setTheme, fetchUserData }: Props) => {
+const Header = ({ user, setUser, theme, setTheme }: Props) => {
     useEffect(() => {
         const pageTheme = localStorage.getItem("theme") || "light";
         setTheme(pageTheme);
@@ -38,19 +37,9 @@ const Header = ({ user, setUser, theme, setTheme, fetchUserData }: Props) => {
 
     const logout = () => {
         // delete the JWT token from the cookie
-        setUser(null);
+        setUser(undefined);
         cookies.remove("jwt_auth");
     };
-
-    useEffect(() => {
-        const checkCookie = async () => {
-            const jwt = await cookies.get("jwt_auth");
-            if (jwt) {
-                fetchUserData();
-            }
-        };
-        checkCookie();
-    }, []);
 
     return (
         <header className="sticky top-0 z-50 flex w-full border-b-2 bg-white py-4 text-sm dark:border-b-0 dark:bg-gray-800">

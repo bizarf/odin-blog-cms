@@ -3,15 +3,10 @@ import dayjs from "dayjs";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import PostsType from "../types/posts";
-import UserType from "../types/user";
 import PostControls from "./PostControls";
 import DeleteModal from "./DeleteModal";
 
-type Props = {
-    user: UserType | undefined;
-};
-
-const AllPosts = ({ user }: Props) => {
+const AllPosts = () => {
     const [posts, setPosts] = useState<PostsType[]>([]);
     // const [totalPosts, setTotalPosts] = useState<number>();
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -41,7 +36,16 @@ const AllPosts = ({ user }: Props) => {
     };
 
     useEffect(() => {
-        fetchPosts();
+        // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
+        const checkCookie = async () => {
+            const jwt = await cookies.get("jwt_auth");
+            if (!jwt) {
+                navigate("/");
+            } else {
+                fetchPosts();
+            }
+        };
+        checkCookie();
     }, []);
 
     const togglePublishBtn = (id: string) => {
@@ -65,17 +69,6 @@ const AllPosts = ({ user }: Props) => {
                 }
             });
     };
-
-    // useEffect(() => {
-    //     // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
-    //     const checkCookie = async () => {
-    //         const jwt = await cookies.get("jwt_auth");
-    //         if (!jwt) {
-    //             navigate("/");
-    //         }
-    //     };
-    //     checkCookie();
-    // }, []);
 
     return (
         <div className="">

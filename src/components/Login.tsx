@@ -61,7 +61,7 @@ const Login = ({ user, fetchUserData }: Props) => {
                                 value: "",
                             },
                         ]);
-                        console.log(error);
+                        // console.log(error);
                     }
                 } else if (Array.isArray(data.errors)) {
                     // error messages from express validator go here
@@ -78,7 +78,7 @@ const Login = ({ user, fetchUserData }: Props) => {
         if (user && !success) {
             navigate("/all-posts");
         }
-    });
+    }, [user]);
 
     return (
         <div className="mx-auto max-w-xs">

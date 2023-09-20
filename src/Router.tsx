@@ -39,7 +39,7 @@ const Router = ({ user, setUser, theme, setTheme, fetchUserData }: Props) => {
                 },
                 {
                     path: "/all-posts",
-                    element: <AllPosts user={user} />,
+                    element: <AllPosts />,
                 },
                 {
                     path: "/new-post",
@@ -47,7 +47,7 @@ const Router = ({ user, setUser, theme, setTheme, fetchUserData }: Props) => {
                 },
                 {
                     path: "/posts/:id",
-                    element: <Post user={user} />,
+                    element: <Post />,
                 },
                 {
                     path: "/edit/:id",
