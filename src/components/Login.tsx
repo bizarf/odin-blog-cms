@@ -7,7 +7,7 @@ import UserType from "../types/user";
 import ErrorsType from "../types/errors";
 
 type Props = {
-    user: UserType | null;
+    user: UserType | undefined;
     fetchUserData: () => void;
 };
 

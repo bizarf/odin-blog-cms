@@ -8,7 +8,7 @@ import PostControls from "./PostControls";
 import DeleteModal from "./DeleteModal";
 
 type Props = {
-    user: UserType | null;
+    user: UserType | undefined;
 };
 
 const AllPosts = ({ user }: Props) => {
@@ -85,10 +85,10 @@ const AllPosts = ({ user }: Props) => {
                 </h2>
                 <div className="mx-6 md:mx-20">
                     {posts &&
-                        posts.map((post, index) => {
+                        posts.map((post) => {
                             return (
                                 <div
-                                    key={index}
+                                    key={post._id}
                                     className="flex flex-col rounded-xl border bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-slate-700/[.7] my-4"
                                 >
                                     <div className="p-4 md:p-5">

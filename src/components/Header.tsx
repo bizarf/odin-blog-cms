@@ -6,8 +6,8 @@ import LightModeBtn from "./LightModeBtn";
 import DarkModeBtn from "./DarkModeBtn";
 
 type Props = {
-    user: UserType | null;
-    setUser: React.Dispatch<React.SetStateAction<UserType | null>>;
+    user: UserType | undefined;
+    setUser: React.Dispatch<React.SetStateAction<UserType | undefined>>;
     theme: string | undefined;
     setTheme: React.Dispatch<React.SetStateAction<string | undefined>>;
     fetchUserData: () => void;

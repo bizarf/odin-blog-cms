@@ -7,7 +7,7 @@ import CommentsType from "../types/comments";
 import UserType from "../types/user";
 
 type Props = {
-    user: UserType | null;
+    user: UserType | undefined;
 };
 
 const Post = ({ user }: Props) => {
@@ -99,10 +99,10 @@ const Post = ({ user }: Props) => {
                 Comments
             </h4>
             {comments &&
-                comments.map((comment, index) => {
+                comments.map((comment) => {
                     return (
                         <div
-                            key={index}
+                            key={comment._id}
                             className="my-3 flex flex-col rounded-xl border bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-slate-700/[.7]"
                         >
                             <div className="flex items-center justify-between">
