@@ -76,8 +76,8 @@ const Header = () => {
                         </>
                     )}
                     {/* dark mode button toggle */}
-                    {theme === "light" && <LightModeBtn setTheme={setTheme} />}
-                    {theme === "dark" && <DarkModeBtn setTheme={setTheme} />}
+                    {theme === "light" && <LightModeBtn />}
+                    {theme === "dark" && <DarkModeBtn />}
                 </div>
             </nav>
         </header>

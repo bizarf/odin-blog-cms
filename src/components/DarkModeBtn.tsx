@@ -1,10 +1,8 @@
-import React from "react";
+import useThemeStore from "../stores/useThemeStore";
 
-type Props = {
-    setTheme: React.Dispatch<React.SetStateAction<string | undefined>>;
-};
+const DarkModeBtn = () => {
+    const { setTheme } = useThemeStore();
 
-const DarkModeBtn = ({ setTheme }: Props) => {
     return (
         <>
             {" "}
