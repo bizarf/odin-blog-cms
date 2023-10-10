@@ -3,20 +3,22 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 import jwtDecode from "jwt-decode";
 import JwtDecodeType from "../types/jwt_decode";
-import UserType from "../types/user";
 import ErrorsType from "../types/errors";
+import useUserStore from "../stores/useUserStore";
 
 type Props = {
-    user: UserType | undefined;
     fetchUserData: () => void;
 };
 
-const Login = ({ user, fetchUserData }: Props) => {
+const Login = ({ fetchUserData }: Props) => {
     const [username, setUsername] = useState<string>();
     const [password, setPassword] = useState<string>();
     const [error, setError] = useState<[ErrorsType] | []>([]);
     // if the success state is true, then the form will disappear and a success message will be displayed to the user
     const [success, setSuccess] = useState<boolean>(false);
+
+    // get user object from the zustand custom hook store
+    const { user } = useUserStore();
 
     // initialize universal-cookie
     const cookies = new Cookies();

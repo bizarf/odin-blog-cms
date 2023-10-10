@@ -1,23 +1,25 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "universal-cookie";
-import UserType from "../types/user";
 import LightModeBtn from "./LightModeBtn";
 import DarkModeBtn from "./DarkModeBtn";
+import useUserStore from "../stores/useUserStore";
+import useThemeStore from "../stores/useThemeStore";
 
-type Props = {
-    user: UserType | undefined;
-    setUser: React.Dispatch<React.SetStateAction<UserType | undefined>>;
-    theme: string | undefined;
-    setTheme: React.Dispatch<React.SetStateAction<string | undefined>>;
-};
+const Header = () => {
+    // import the user object and setUser function from the zustand custom hook store
+    const { user, setUser } = useUserStore();
 
-const Header = ({ user, setUser, theme, setTheme }: Props) => {
+    // import the theme string and the setTheme function from the zustand custom hook store
+    const { theme, setTheme } = useThemeStore();
+
+    // on page render, check the localstorage for the theme. if it doesn't exist set it to light
     useEffect(() => {
         const pageTheme = localStorage.getItem("theme") || "light";
         setTheme(pageTheme);
     }, []);
 
+    // whenever the theme changes, we alter the class list
     useEffect(() => {
         const handleThemeChange = () => {
             const htmlElement = document.querySelector("html");
