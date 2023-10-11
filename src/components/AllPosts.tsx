@@ -1,39 +1,53 @@
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Cookies from "universal-cookie";
 import PostsType from "../types/posts";
 import PostControls from "./PostControls";
 import DeleteModal from "./DeleteModal";
+import ReactPaginate from "react-paginate";
 
 const AllPosts = () => {
     const [posts, setPosts] = useState<PostsType[]>([]);
-    // const [totalPosts, setTotalPosts] = useState<number>();
+    const [totalPosts, setTotalPosts] = useState<number>();
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
     // user clicks the delete button of a mapped post which sets the post id state. we can then delete the correct post within the modal
     const [postId, setPostId] = useState<string>("");
 
     const cookies = new Cookies();
     const navigate = useNavigate();
-    // const { id } = useParams();
+
+    // get the page number from the URL search params
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPageNumber = Number(searchParams.get("page"));
 
     const fetchPosts = () => {
         // need to send the JWT as the all posts get for author's is protected by JWT
         const jwt = cookies.get("jwt_auth");
 
-        fetch("https://odin-blog-api-ofv2.onrender.com/api/author/posts", {
-            headers: {
-                Authorization: `Bearer ${jwt}`,
-            },
-        })
+        fetch(
+            `https://odin-blog-api-ofv2.onrender.com/api/author/posts?page=${currentPageNumber}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${jwt}`,
+                },
+            }
+        )
             .then((response) => {
                 return response.json();
             })
             .then((data) => {
                 setPosts(data.allPosts);
-                // setTotalPosts(data.totalPublishedPostsCount);
+                setTotalPosts(data.totalPostsCount);
             });
     };
+
+    // when the page number in the search params changes, we run the fetchPosts function
+    useEffect(() => {
+        fetchPosts();
+    }, [currentPageNumber]);
+
+    const totalPages = Math.ceil(totalPosts! / 10);
 
     useEffect(() => {
         // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
@@ -68,6 +82,16 @@ const AllPosts = () => {
                     navigate(0);
                 }
             });
+    };
+
+    // pagination function
+    const handlePageClick = (e: { selected: number }) => {
+        // e.selected returns values starting from 0. I'll need to add 1 to this or else the wrong pages will be returned.
+        const page = e.selected + 1;
+        // searchParams set takes in a name and a value. e.selected returns a number, so need to convert that to string to use in search params
+        searchParams.set("page", page.toString());
+        // once that's done update the search params
+        setSearchParams(searchParams);
     };
 
     return (
@@ -142,6 +166,24 @@ const AllPosts = () => {
                         />
                     )}
                 </div>
+                {totalPages && (
+                    <ReactPaginate
+                        pageCount={totalPages}
+                        breakLabel="..."
+                        nextLabel="Next >"
+                        pageRangeDisplayed={5}
+                        previousLabel="< Previous"
+                        renderOnZeroPageCount={null}
+                        onPageChange={handlePageClick}
+                        className="flex items-center space-x-4 justify-center py-2"
+                        activeClassName="bg-blue-500 justify-center"
+                        pageClassName="w-10 h-10 hover:text-blue-600 p-4 inline-flex items-center text-sm font-medium rounded-full dark:text-white"
+                        previousClassName="dark:text-white hover:text-blue-600 p-4 inline-flex items-center gap-2 rounded-md"
+                        nextClassName="dark:text-white hover:text-blue-600 p-4 inline-flex items-center gap-2 rounded-md"
+                        disabledClassName="pointer-events-none"
+                        breakClassName="dark:text-white"
+                    />
+                )}
             </div>
         </div>
     );

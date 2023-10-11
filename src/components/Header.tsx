@@ -56,7 +56,7 @@ const Header = () => {
                         <>
                             <Link
                                 className="whitespace-nowrap px-2 text-sm text-slate-700 hover:text-slate-950 dark:text-white dark:hover:text-slate-200"
-                                to="/all-posts"
+                                to="/"
                             >
                                 All Articles
                             </Link>

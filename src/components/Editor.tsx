@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 const Editor = () => {
     const [title, setTitle] = useState<string>("");
     const [textContent, setTextContent] = useState<string>("");
-    const [publish, setPublish] = useState<string>("");
+    const [publish, setPublish] = useState<string>("no");
     const [error, setError] = useState<[ErrorsType] | []>([]);
 
     // init universal-cookie
@@ -103,12 +103,6 @@ const Editor = () => {
                 <label htmlFor="mainContent" className="sr-only">
                     Main content
                 </label>
-                {/* <ReactQuill
-                    id="mainContent"
-                    theme="snow"
-                    value={textContent}
-                    onChange={setTextContent}
-                /> */}
                 <textarea
                     name="textContent"
                     id="mainContent"
