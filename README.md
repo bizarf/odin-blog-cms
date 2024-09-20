@@ -15,12 +15,6 @@ To run this project on your local server, first install the dependencies with th
 npm install
 ```
 
-Head into the @types folder in node_modules and create a file called "preline.d.ts". Inside this file add this code:
-
-```
-declare module "preline";
-```
-
 After that is done, you can start the server with:
 
 ```
@@ -32,13 +26,9 @@ npm run dev
 ##### Tools and technologies used:
 
 -   React
--   React Router
 -   Vite
 -   Typescript
 -   TailwindCSS
--   Preline CSS
--   DayJS
--   Universal-Cookie
+-   shadcn/ui
 -   ESLint
 -   Prettier
--   JWT Decode

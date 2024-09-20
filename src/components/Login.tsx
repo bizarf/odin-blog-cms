@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import JwtDecodeType from "../types/jwt_decode";
 import ErrorsType from "../types/errors";
 import useUserStore from "../stores/useUserStore";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 type Props = {
     fetchUserData: () => void;
 };
 
 const Login = ({ fetchUserData }: Props) => {
-    const [username, setUsername] = useState<string>();
-    const [password, setPassword] = useState<string>();
     const [error, setError] = useState<[ErrorsType] | []>([]);
     // if the success state is true, then the form will disappear and a success message will be displayed to the user
     const [success, setSuccess] = useState<boolean>(false);
@@ -24,19 +35,32 @@ const Login = ({ fetchUserData }: Props) => {
     const cookies = new Cookies();
     const navigate = useNavigate();
 
-    const sendLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // make an object with the username and password input states
-        const data = { username, password };
+    const loginFormSchema = z.object({
+        username: z
+            .string()
+            .email({ message: "Username must be a valid email address" }),
+        password: z
+            .string()
+            .min(8, { message: "Password must be at least 8 characters long" }),
+    });
 
+    const form = useForm<z.infer<typeof loginFormSchema>>({
+        resolver: zodResolver(loginFormSchema),
+        defaultValues: {
+            username: "",
+            password: "",
+        },
+    });
+
+    const sendLogin = async (values: z.infer<typeof loginFormSchema>) => {
         // start fetch api, with a post method and set the header content type to json
         fetch("https://odin-blog-api-ofv2.onrender.com/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            // need to stringify the username and password to be able to send them as JSON objects
-            body: JSON.stringify(data),
+            // need to stringify the values object to be able to send them as a JSON payload
+            body: JSON.stringify(values),
         })
             .then((res) => res.json())
             .then((data) => {
@@ -89,91 +113,67 @@ const Login = ({ fetchUserData }: Props) => {
                     <h2 className="py-4 text-center text-2xl font-bold text-gray-800  dark:text-white">
                         Login
                     </h2>
-                    <form
-                        onSubmit={(e) => sendLogin(e)}
-                        className="rounded-xl border border-slate-500 p-4 dark:bg-gray-800"
-                    >
-                        <label
-                            htmlFor="username"
-                            className="block font-semibold dark:text-white"
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(sendLogin)}
+                            className="space-y-3 rounded-xl border border-slate-500 p-4 dark:bg-gray-800"
                         >
-                            Username
-                        </label>
-                        <input
-                            type="email"
-                            name="username"
-                            id="username"
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="block w-full rounded-md border-gray-400 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400"
-                        />
-                        {error.map((error, index) => {
-                            if (error.path === "username") {
+                            <FormField
+                                control={form.control}
+                                name="username"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Username (E-mail)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Username (E-mail)"
+                                                {...field}
+                                                className="dark:bg-slate-900"
+                                                maxLength={255}
+                                                type="email"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Password"
+                                                {...field}
+                                                className="dark:bg-slate-900"
+                                                maxLength={32}
+                                                type="password"
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {error.map((error, index) => {
                                 return (
                                     <div
                                         key={index}
-                                        className="text-sm text-red-600"
+                                        className="text-sm text-red-600 dark:text-red-500"
                                     >
                                         {error.msg}
                                     </div>
                                 );
-                            }
-                        })}
-                        <label
-                            htmlFor="password"
-                            className="mt-3 block font-semibold dark:text-white"
-                        >
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="block w-full rounded-md border-gray-400 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400"
-                        />
-                        {error.map((error, index) => {
-                            // error messages from express validator
-                            if (error.path === "password") {
-                                return (
-                                    <div
-                                        key={index}
-                                        className="text-sm text-red-600"
-                                    >
-                                        {error.msg}
-                                    </div>
-                                );
-                                // error message from passport js
-                            } else if (error.msg === "Incorrect password") {
-                                return (
-                                    <div
-                                        key={index}
-                                        className="text-sm text-red-600"
-                                    >
-                                        {error.msg}
-                                    </div>
-                                );
-                            } else if (
-                                error.msg === "Sorry, you are not authorized"
-                            ) {
-                                return (
-                                    <div
-                                        key={index}
-                                        className="text-sm text-red-600"
-                                    >
-                                        {error.msg}
-                                    </div>
-                                );
-                            }
-                        })}
-                        <div className="flex justify-center">
-                            <button
+                            })}
+                            <Button
                                 type="submit"
-                                className="mt-3 rounded-md border border-transparent bg-blue-600 px-10 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:bg-green-800 dark:hover:bg-green-900 dark:focus:ring-offset-gray-800"
+                                className="w-full bg-blue-500 dark:text-white"
                             >
                                 Submit
-                            </button>
-                        </div>
-                    </form>
+                            </Button>
+                        </form>
+                    </Form>
                 </>
             ) : (
                 <h2 className="py-4 text-center text-2xl font-bold text-gray-800  dark:text-white">

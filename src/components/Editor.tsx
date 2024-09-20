@@ -2,11 +2,29 @@ import React, { useEffect, useState } from "react";
 import Cookies from "universal-cookie";
 import ErrorsType from "../types/errors";
 import { useNavigate, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const Editor = () => {
-    const [title, setTitle] = useState<string>("");
-    const [textContent, setTextContent] = useState<string>("");
-    const [publish, setPublish] = useState<string>("no");
     const [error, setError] = useState<[ErrorsType] | []>([]);
 
     // init universal-cookie
@@ -16,11 +34,26 @@ const Editor = () => {
     // useParams init
     const { id } = useParams();
 
-    const sendPost = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // make object containing the three input states
-        const data = { title, textContent, publish };
+    const editorFormSchema = z.object({
+        title: z
+            .string()
+            .min(3, { message: "Title must be at least 3 characters long" }),
+        textContent: z
+            .string()
+            .min(3, { message: "Content must be at least 3 characters long" }),
+        publish: z.string(),
+    });
 
+    const form = useForm<z.infer<typeof editorFormSchema>>({
+        resolver: zodResolver(editorFormSchema),
+        defaultValues: {
+            title: "",
+            textContent: "",
+            publish: "no",
+        },
+    });
+
+    const sendPost = async (values: z.infer<typeof editorFormSchema>) => {
         // get the jwt from the cookie. need to send this in the post request
         const jwt = cookies.get("jwt_auth");
 
@@ -31,8 +64,8 @@ const Editor = () => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${jwt}`,
             },
-            // need to stringify the username and password to be able to send them as JSON objects
-            body: JSON.stringify(data),
+            // need to stringify the form values object to be able to send them as JSON payload
+            body: JSON.stringify(values),
         })
             .then((res) => res.json())
             .then((data) => {
@@ -57,6 +90,7 @@ const Editor = () => {
     };
 
     useEffect(() => {
+        // if an id is provided, then fetch the post and set the form values to the post values
         if (id) {
             fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}`)
                 .then((response) => {
@@ -69,9 +103,9 @@ const Editor = () => {
                 })
                 .then((data) => {
                     if (data) {
-                        setTitle(data.post.title);
-                        setTextContent(data.post.textContent);
-                        setPublish(data.post.published);
+                        form.setValue("title", data.post.title);
+                        form.setValue("textContent", data.post.textContent);
+                        form.setValue("publish", data.post.published);
                     }
                 });
         }
@@ -82,63 +116,81 @@ const Editor = () => {
             <h2 className="text-xl font-bold text-gray-800 dark:text-white text-center my-2">
                 Create a post
             </h2>
-            <form
-                onSubmit={(e) => sendPost(e)}
-                className="rounded-xl border border-slate-500 p-4 dark:bg-gray-800"
-            >
-                <label
-                    htmlFor="title"
-                    className="block font-semibold dark:text-white"
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(sendPost)}
+                    className="rounded-xl border border-slate-500 p-4 dark:bg-gray-800 space-y-3"
                 >
-                    Title
-                </label>
-                <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    className="block w-full rounded-md border-gray-400 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400 mb-3"
-                    onChange={(e) => setTitle(e.target.value)}
-                    value={title}
-                />
-                <label htmlFor="mainContent" className="sr-only">
-                    Main content
-                </label>
-                <textarea
-                    name="textContent"
-                    id="mainContent"
-                    rows={10}
-                    className="w-full"
-                    value={textContent}
-                    onChange={(e) => setTextContent(e.target.value)}
-                ></textarea>
-                <label
-                    htmlFor="publish"
-                    className="mt-3 block font-semibold dark:text-white"
-                >
-                    Do you want this post to be published?
-                </label>
-                <select
-                    name="publish"
-                    id="publish"
-                    onChange={(e) => setPublish(e.target.value)}
-                    className="block w-20 rounded-md border-gray-400 px-4 py-3 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-slate-900 dark:text-gray-400"
-                    value={publish}
-                >
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                </select>
-                <button
-                    type="submit"
-                    className="postSubmitBtn mt-3 rounded-md border border-transparent bg-blue-600 px-10 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:bg-green-800 dark:hover:bg-green-900 dark:focus:ring-offset-gray-800"
-                >
-                    Submit
-                </button>
-                {error.map((errors, index) => (
-                    <div key={index} className="text-sm text-red-600">
-                        {errors.msg}
-                    </div>
-                ))}
-            </form>
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        placeholder="Title"
+                                        {...field}
+                                        className="dark:bg-slate-900"
+                                        maxLength={255}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="textContent"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        placeholder="Text Content"
+                                        {...field}
+                                        className="dark:bg-slate-900"
+                                        rows={10}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="publish"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Do you want this post to be published?
+                                </FormLabel>
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger className="dark:bg-slate-900">
+                                            <SelectValue placeholder="Select whether you want the post to be published" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="no">No</SelectItem>
+                                        <SelectItem value="yes">Yes</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button className="mt-3">Submit</Button>
+                    {error.map((errors, index) => (
+                        <div key={index} className="text-sm text-red-600">
+                            {errors.msg}
+                        </div>
+                    ))}
+                </form>
+            </Form>
         </div>
     );
 };
