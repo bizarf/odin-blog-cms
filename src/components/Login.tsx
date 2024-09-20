@@ -24,8 +24,6 @@ type Props = {
 };
 
 const Login = ({ fetchUserData }: Props) => {
-    const [username, setUsername] = useState<string>();
-    const [password, setPassword] = useState<string>();
     const [error, setError] = useState<[ErrorsType] | []>([]);
     // if the success state is true, then the form will disappear and a success message will be displayed to the user
     const [success, setSuccess] = useState<boolean>(false);

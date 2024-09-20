@@ -48,7 +48,7 @@ const Header = () => {
             <nav className="flex w-full flex-row items-center justify-between gap-5 px-5 ">
                 <Link to="/">
                     <div className="text-slate-700 text-xl dark:text-white">
-                        The Blog CMS
+                        Odin Blog CMS
                     </div>
                 </Link>
                 <div className="inline-flex">
