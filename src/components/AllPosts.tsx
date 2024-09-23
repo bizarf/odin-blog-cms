@@ -7,6 +7,8 @@ import PostControls from "./PostControls";
 import DeleteModal from "./DeleteModal";
 import ReactPaginate from "react-paginate";
 import { Button } from "@/components/ui/button";
+import { fetchAllPosts } from "@/helper/fetchAllPosts";
+import { togglePublish } from "@/helper/togglePublish";
 
 const AllPosts = () => {
     const [posts, setPosts] = useState<PostsType[]>([]);
@@ -16,31 +18,17 @@ const AllPosts = () => {
     const [postId, setPostId] = useState<string>("");
 
     const cookies = new Cookies();
+    const jwt = cookies.get("jwt_auth");
     const navigate = useNavigate();
 
     // get the page number from the URL search params
     const [searchParams, setSearchParams] = useSearchParams();
     const currentPageNumber = Number(searchParams.get("page"));
 
-    const fetchPosts = () => {
-        // need to send the JWT as the all posts get for author's is protected by JWT
-        const jwt = cookies.get("jwt_auth");
-
-        fetch(
-            `https://odin-blog-api-ofv2.onrender.com/api/author/posts?page=${currentPageNumber}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${jwt}`,
-                },
-            }
-        )
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                setPosts(data.allPosts);
-                setTotalPosts(data.totalPostsCount);
-            });
+    const fetchPosts = async () => {
+        const data = await fetchAllPosts(jwt, currentPageNumber);
+        setPosts(data.allPosts);
+        setTotalPosts(data.totalPostsCount);
     };
 
     // when the page number in the search params changes, we run the fetchPosts function
@@ -53,7 +41,6 @@ const AllPosts = () => {
     useEffect(() => {
         // check the cookie instead of waiting for the user state. this avoids the login page flashing for a second when refreshing the all-posts page
         const checkCookie = async () => {
-            const jwt = await cookies.get("jwt_auth");
             if (!jwt) {
                 navigate("/");
             } else {
@@ -63,26 +50,14 @@ const AllPosts = () => {
         checkCookie();
     }, []);
 
-    const togglePublishBtn = (id: string) => {
+    const togglePublishBtn = async (id: string) => {
         // need to send the JWT as the all posts get for author's is protected by JWT
-        const jwt = cookies.get("jwt_auth");
-
-        fetch(
-            `https://odin-blog-api-ofv2.onrender.com/api/author/post/${id}/publish`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwt}`,
-                },
-            }
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.message === "Post successfully updated") {
-                    navigate(0);
-                }
-            });
+        const data = await togglePublish(id, jwt);
+        if (data.message === "Post successfully updated") {
+            navigate(0);
+        } else {
+            console.log(data.message);
+        }
     };
 
     // pagination function

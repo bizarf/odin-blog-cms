@@ -2,6 +2,7 @@ import React from "react";
 import Cookies from "universal-cookie";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { deletePost } from "@/helper/deletePost";
 
 type Props = {
     setDeleteModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,24 +17,15 @@ const DeleteModal = ({ setDeleteModal, postId }: Props) => {
         setDeleteModal((state) => !state);
     };
 
-    const deletePost = (postId: string) => {
+    const handleDeletePost = async (postId: string) => {
         // need to send the jwt as the route is protected
         const jwt = cookies.get("jwt_auth");
 
-        fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${postId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${jwt}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.message === "Post successfully deleted") {
-                    // refresh the page
-                    navigate(0);
-                }
-            });
+        const data = await deletePost(jwt, postId);
+        if (data.message === "Post successfully deleted") {
+            // refresh the page
+            navigate(0);
+        }
     };
 
     return (
@@ -51,7 +43,10 @@ const DeleteModal = ({ setDeleteModal, postId }: Props) => {
                     Do you want to delete this post?
                 </h2>
                 <div className="flex justify-center">
-                    <Button className="mr-4" onClick={() => deletePost(postId)}>
+                    <Button
+                        className="mr-4"
+                        onClick={() => handleDeletePost(postId)}
+                    >
                         Yes
                     </Button>
                     <Button onClick={handleCloseModal}>No</Button>

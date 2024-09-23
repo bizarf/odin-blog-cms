@@ -11,25 +11,24 @@ const App = () => {
 
     const cookies = new Cookies();
 
-    const fetchUserData = () => {
+    const fetchUserData = async () => {
         const jwt = cookies.get("jwt_auth");
         const decode: JwtDecodeType = jwtDecode(jwt);
 
-        fetch(
-            `https://odin-blog-api-ofv2.onrender.com/api/user/${decode.user}`,
+        const response = await fetch(
+            `${import.meta.env.VITE_API_HOST}/api/user/${decode.user}`,
             {
                 method: "get",
                 headers: {
                     "Content-Type": "application/json",
                 },
             }
-        )
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.success === true && data.user.isAuthor) {
-                    setUser(data.user);
-                }
-            });
+        );
+
+        const data = await response.json();
+        if (data.success === true && data.user.isAuthor) {
+            setUser(data.user);
+        }
     };
 
     return (
