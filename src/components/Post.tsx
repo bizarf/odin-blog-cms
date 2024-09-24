@@ -29,7 +29,7 @@ const Post = () => {
     }, []);
 
     const fetchPost = async () => {
-        fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}`)
+        fetch(`${import.meta.env.VITE_API_HOST}/api/post/${id}`)
             .then((response) => {
                 if (response.ok) {
                     return response.json();
@@ -46,7 +46,7 @@ const Post = () => {
 
     const fetchComments = async () => {
         // fetch comments on post
-        fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}/comments`)
+        fetch(`${import.meta.env.VITE_API_HOST}/api/post/${id}/comments`)
             .then((response) => {
                 return response.json();
             })
@@ -58,16 +58,13 @@ const Post = () => {
     const handleDeleteComment = (commentId: string) => {
         const jwt = cookies.get("jwt_auth");
 
-        fetch(
-            `https://odin-blog-api-ofv2.onrender.com/api/post/${id}/${commentId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${jwt}`,
-                },
-            }
-        )
+        fetch(`${import.meta.env.VITE_API_HOST}/api/post/${id}/${commentId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${jwt}`,
+            },
+        })
             .then((res) => res.json())
             .then((data) => {
                 if (data.message === "Post successfully deleted") {

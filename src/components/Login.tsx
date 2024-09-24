@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import JwtDecodeType from "../types/jwt_decode";
 import ErrorsType from "../types/errors";
 import useUserStore from "../stores/useUserStore";
+import { fetchUserData } from "../helper/fetchUserData";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,17 +20,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-type Props = {
-    fetchUserData: () => void;
-};
-
-const Login = ({ fetchUserData }: Props) => {
+const Login = () => {
     const [error, setError] = useState<[ErrorsType] | []>([]);
     // if the success state is true, then the form will disappear and a success message will be displayed to the user
     const [success, setSuccess] = useState<boolean>(false);
 
     // get user object from the zustand custom hook store
-    const { user } = useUserStore();
+    const { user, setUser } = useUserStore();
 
     // initialize universal-cookie
     const cookies = new Cookies();
@@ -54,7 +51,7 @@ const Login = ({ fetchUserData }: Props) => {
 
     const sendLogin = async (values: z.infer<typeof loginFormSchema>) => {
         // start fetch api, with a post method and set the header content type to json
-        fetch("https://odin-blog-api-ofv2.onrender.com/api/login", {
+        fetch(`${import.meta.env.VITE_API_HOST}/api/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -63,7 +60,7 @@ const Login = ({ fetchUserData }: Props) => {
             body: JSON.stringify(values),
         })
             .then((res) => res.json())
-            .then((data) => {
+            .then(async (data) => {
                 // data object can either return a token or errors. if we get the token object, then we decode the token and set that as the user state. we store the jwt in the cookie.
                 if (data.token) {
                     const decode: JwtDecodeType = jwtDecode(data.token);
@@ -71,12 +68,13 @@ const Login = ({ fetchUserData }: Props) => {
                         // multiply the expiration value from the jwt by 1000 to change the value to milliseconds so that it'll become a valid date
                         expires: new Date(decode.exp * 1000),
                     });
-                    fetchUserData();
-                    if (user?.isAuthor) {
+                    const userData = await fetchUserData(data.token);
+                    if (userData.success && userData.user.isAuthor) {
                         setSuccess((state) => !state);
                         setTimeout(() => {
+                            setUser(userData.user);
                             navigate("/all-posts");
-                        }, 500);
+                        }, 2000);
                     } else {
                         setError([
                             {

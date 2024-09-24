@@ -6,21 +6,17 @@ import Editor from "./components/Editor";
 import NoPostError from "./components/NoPostError";
 import MainLayout from "./components/MainLayout.tsx";
 
-type Props = {
-    fetchUserData: () => void;
-};
-
-const Router = ({ fetchUserData }: Props) => {
+const Router = () => {
     // using hashrouter as Github pages does not support BrowserRouter
     const router = createHashRouter([
         {
             path: "/",
-            element: <MainLayout fetchUserData={fetchUserData} />,
+            element: <MainLayout />,
             children: [
                 // the mainlayout uses an outlet and setting this will make the homepage the default page for that outlet element
                 {
                     index: true,
-                    element: <Login fetchUserData={fetchUserData} />,
+                    element: <Login />,
                 },
                 {
                     path: "/all-posts",

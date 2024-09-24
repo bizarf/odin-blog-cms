@@ -58,7 +58,7 @@ const Editor = () => {
         const jwt = cookies.get("jwt_auth");
 
         // start fetch api, with a post method and set the header content type to json
-        fetch(`https://odin-blog-api-ofv2.onrender.com/api/create-post`, {
+        fetch(`${import.meta.env.VITE_API_HOST}/api/create-post`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -92,7 +92,7 @@ const Editor = () => {
     useEffect(() => {
         // if an id is provided, then fetch the post and set the form values to the post values
         if (id) {
-            fetch(`https://odin-blog-api-ofv2.onrender.com/api/post/${id}`)
+            fetch(`${import.meta.env.VITE_API_HOST}/api/post/${id}`)
                 .then((response) => {
                     if (response.ok) {
                         return response.json();

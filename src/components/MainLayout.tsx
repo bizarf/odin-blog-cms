@@ -3,20 +3,29 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import Cookies from "universal-cookie";
+import { fetchUserData } from "../helper/fetchUserData";
+import useUserStore from "../stores/useUserStore";
 
-type Props = {
-    fetchUserData: () => void;
-};
-
-const MainLayout = ({ fetchUserData }: Props) => {
+const MainLayout = () => {
     const cookies = new Cookies();
     const navigate = useNavigate();
+
+    const { setUser } = useUserStore();
 
     useEffect(() => {
         const checkCookie = async () => {
             const jwt = await cookies.get("jwt_auth");
             if (jwt) {
-                fetchUserData();
+                // if the server is down, then send the user back to the login page instead of leaving them on a empty page
+                try {
+                    const data = await fetchUserData(jwt);
+                    if (data.success && data.user) {
+                        setUser(data.user);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    navigate("/");
+                }
             } else {
                 navigate("/");
             }
