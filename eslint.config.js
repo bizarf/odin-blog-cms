@@ -4,6 +4,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import vitest from "@vitest/eslint-plugin";
 
 export default tseslint.config(
     { ignores: ["dist"] },
@@ -17,7 +18,7 @@ export default tseslint.config(
         plugins: {
             "react-hooks": reactHooks,
             "react-refresh": reactRefresh,
-
+            vitest,
             eslintPluginPrettierRecommended,
         },
         rules: {
@@ -26,6 +27,7 @@ export default tseslint.config(
                 "warn",
                 { allowConstantExport: true },
             ],
+            ...vitest.configs.recommended.rules,
         },
     }
 );

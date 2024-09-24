@@ -20,10 +20,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-type Props = {
-    fetchUserData: () => void;
-};
-
 const Login = () => {
     const [error, setError] = useState<[ErrorsType] | []>([]);
     // if the success state is true, then the form will disappear and a success message will be displayed to the user
@@ -78,7 +74,6 @@ const Login = () => {
                         setTimeout(() => {
                             setUser(userData.user);
                             navigate("/all-posts");
-                            // navigate(0);
                         }, 2000);
                     } else {
                         setError([

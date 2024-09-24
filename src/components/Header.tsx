@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Cookies from "universal-cookie";
-import LightModeBtn from "./LightModeBtn";
-import DarkModeBtn from "./DarkModeBtn";
+import LightModeBtn from "./buttons/LightModeBtn";
+import DarkModeBtn from "./buttons/DarkModeBtn";
 import useUserStore from "../stores/useUserStore";
 import useThemeStore from "../stores/useThemeStore";
 
